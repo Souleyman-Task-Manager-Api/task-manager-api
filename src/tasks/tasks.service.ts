@@ -1,131 +1,82 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Task, TaskStatus, TaskPriority } from '../models/task.model';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { TaskEntity } from './entities/task.entity';
 import { CreateTaskDto, UpdateTaskDto } from '../models/dto';
+import { TaskStatus, TaskPriority } from '../models/task.model';
 
 @Injectable()
 export class TasksService {
-  private tasks: Map<string, Task> = new Map();
-  private currentId: number = 1;
+  constructor(
+    @InjectRepository(TaskEntity)
+    private readonly taskRepository: Repository<TaskEntity>,
+  ) {}
 
-  constructor() {
-    this.initializeDemoTasks();
-  }
-
-  private initializeDemoTasks(): void {
-    const demoTasks: CreateTaskDto[] = [
-      {
-        title: 'Apprendre TypeScript',
-        description: 'Terminer le cours sur les bases de TypeScript',
-        priority: TaskPriority.HIGH,
-        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        tags: ['formation', 'programmation']
-      },
-      {
-        title: 'Faire les courses',
-        description: 'Acheter des fruits, légumes et produits laitiers',
-        priority: TaskPriority.MEDIUM,
-        dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-        tags: ['personnel', 'courses']
-      },
-      {
-        title: 'Rendez-vous médecin',
-        description: 'Consultation annuelle de contrôle',
-        priority: TaskPriority.URGENT,
-        dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
-        tags: ['santé', 'important']
-      }
-    ];
-
-    demoTasks.forEach(task => this.create(task));
-  }
-
-  private generateId(): string {
-    return `TASK-${Date.now()}-${this.currentId++}`;
-  }
-
-  create(createTaskDto: CreateTaskDto): Task {
-    const now = new Date();
-    const newTask: Task = {
-      id: this.generateId(),
+  async create(createTaskDto: CreateTaskDto): Promise<TaskEntity> {
+    const newTask = this.taskRepository.create({
       title: createTaskDto.title,
       description: createTaskDto.description,
-      status: TaskStatus.PENDING,
       priority: createTaskDto.priority || TaskPriority.MEDIUM,
-      createdAt: now,
-      updatedAt: now,
       dueDate: createTaskDto.dueDate,
-      tags: createTaskDto.tags || []
-    };
-
-    this.tasks.set(newTask.id, newTask);
-    return newTask;
+      tags: createTaskDto.tags || [],
+    });
+    return this.taskRepository.save(newTask);
   }
 
-  findAll(): Task[] {
-    return Array.from(this.tasks.values());
+  async findAll(): Promise<TaskEntity[]> {
+    return this.taskRepository.find();
   }
 
-  findOne(id: string): Task {
-    const task = this.tasks.get(id);
+  async findOne(id: string): Promise<TaskEntity> {
+    const task = await this.taskRepository.findOne({ where: { id } });
     if (!task) {
       throw new NotFoundException(`Tâche avec l'ID ${id} non trouvée`);
     }
     return task;
   }
 
-  update(id: string, updateTaskDto: UpdateTaskDto): Task {
-    const task = this.findOne(id);
-
-    const updatedTask: Task = {
-      ...task,
-      title: updateTaskDto.title ?? task.title,
-      description: updateTaskDto.description ?? task.description,
-      status: updateTaskDto.status ?? task.status,
-      priority: updateTaskDto.priority ?? task.priority,
-      dueDate: updateTaskDto.dueDate ?? task.dueDate,
-      tags: updateTaskDto.tags ?? task.tags,
-      updatedAt: new Date()
-    };
-
-    this.tasks.set(id, updatedTask);
-    return updatedTask;
+  async update(id: string, updateTaskDto: UpdateTaskDto): Promise<TaskEntity> {
+    const task = await this.findOne(id);
+    Object.assign(task, updateTaskDto);
+    return this.taskRepository.save(task);
   }
 
-  remove(id: string): void {
-    this.findOne(id);
-    this.tasks.delete(id);
+  async remove(id: string): Promise<void> {
+    const task = await this.findOne(id);
+    await this.taskRepository.remove(task);
   }
 
-  findByPriority(priority: TaskPriority): Task[] {
-    return this.findAll().filter(task => task.priority === priority);
+  async findByPriority(priority: TaskPriority): Promise<TaskEntity[]> {
+    return this.taskRepository.find({ where: { priority } });
   }
 
-  findByStatus(status: TaskStatus): Task[] {
-    return this.findAll().filter(task => task.status === status);
+  async findByStatus(status: TaskStatus): Promise<TaskEntity[]> {
+    return this.taskRepository.find({ where: { status } });
   }
 
-  getOverdueTasks(): Task[] {
+  async getOverdueTasks(): Promise<TaskEntity[]> {
     const now = new Date();
-    return this.findAll().filter(task =>
+    const tasks = await this.taskRepository.find();
+    return tasks.filter(task =>
       task.dueDate &&
-      task.dueDate < now &&
+      new Date(task.dueDate) < now &&
       task.status !== TaskStatus.COMPLETED &&
       task.status !== TaskStatus.CANCELLED
     );
   }
 
-  completeTask(id: string): Task {
+  async completeTask(id: string): Promise<TaskEntity> {
     return this.update(id, { status: TaskStatus.COMPLETED });
   }
 
-  getStats() {
-    const tasks = this.findAll();
+  async getStats() {
+    const tasks = await this.findAll();
     return {
       total: tasks.length,
       pending: tasks.filter(t => t.status === TaskStatus.PENDING).length,
       inProgress: tasks.filter(t => t.status === TaskStatus.IN_PROGRESS).length,
       completed: tasks.filter(t => t.status === TaskStatus.COMPLETED).length,
-      cancelled: tasks.filter(t => t.status === TaskStatus.CANCELLED).length
+      cancelled: tasks.filter(t => t.status === TaskStatus.CANCELLED).length,
     };
   }
 }

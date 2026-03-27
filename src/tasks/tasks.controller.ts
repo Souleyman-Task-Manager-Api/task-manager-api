@@ -39,6 +39,16 @@ export class TasksController {
     return this.tasksService.findByStatus(status);
   }
 
+  @Get('db-info')  // ⚠️ Important : doit être AVANT la route :id !
+  @ApiOperation({ summary: 'Informations sur la base de données' })
+  async getDbInfo() {
+    return {
+      database: 'task-manager.db',
+      tables: ['tasks'],
+      fields: ['id', 'title', 'description', 'status', 'priority', 'createdAt', 'updatedAt', 'dueDate', 'tags']
+    };
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Récupérer une tâche par son ID' })
   getTaskById(@Param('id') id: string) {

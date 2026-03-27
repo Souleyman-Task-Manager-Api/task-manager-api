@@ -1,9 +1,17 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { TasksModule } from './tasks/tasks.module';
+import { TaskEntity } from './tasks/entities/task.entity';
 
 @Module({
-  imports: [TasksModule],
-  controllers: [],
-  providers: [],
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'sqlite',
+      database: 'task-manager.db',
+      entities: [TaskEntity],
+      synchronize: true,
+    }),
+    TasksModule,
+  ],
 })
 export class AppModule {}

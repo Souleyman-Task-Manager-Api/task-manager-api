@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TasksModule } from './tasks/tasks.module';
+import { AppController } from './app.controller';
 import { TaskEntity } from './tasks/entities/task.entity';
 
 @Module({
@@ -13,5 +14,7 @@ import { TaskEntity } from './tasks/entities/task.entity';
     }),
     TasksModule,
   ],
+  controllers: [AppController],  // ← Ajoutez cette ligne
+  providers: [],
 })
 export class AppModule {}

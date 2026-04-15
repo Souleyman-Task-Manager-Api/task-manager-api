@@ -1,18 +1,28 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
-@ApiTags('Hello')
+@ApiTags('Accueil')
 @Controller()
 export class AppController {
   @Get()
-  @ApiOperation({ summary: 'Afficher Hello World' })
-  getHello(): string {
-    return 'Hello World! 🚀';
+  @ApiOperation({ summary: 'Page d\'accueil de l\'API' })
+  getHome() {
+    return {
+      message: 'Bienvenue sur l\'API Task Manager',
+      version: '1.0',
+      endpoints: {
+        tasks: '/tasks',
+        stats: '/tasks/stats',
+        docs: '/api-docs',
+        signin: '/account/signin',
+        signup: '/account/signup'
+      }
+    };
   }
 
   @Get('hello')
-  @ApiOperation({ summary: 'Afficher un message de bienvenue' })
-  getHelloMessage(): string {
-    return 'Bienvenue sur mon API Task Manager !';
+  @ApiOperation({ summary: 'Message de bienvenue' })
+  getHello() {
+    return { message: 'Hello World! 🚀' };
   }
 }

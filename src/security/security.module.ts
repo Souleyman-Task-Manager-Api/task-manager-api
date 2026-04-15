@@ -13,7 +13,7 @@ import { ConfigKey } from '@common/config/enum';
     JwtModule.register({
       global: true,
       secret: configManager.getValue(ConfigKey.JWT_TOKEN_SECRET),
-      signOptions: { expiresIn: configManager.getValue(ConfigKey.JWT_TOKEN_EXPIRE_IN) },
+      signOptions: { expiresIn: configManager.getValue(ConfigKey.JWT_TOKEN_EXPIRE_IN) as any },
     }),
     TypeOrmModule.forFeature([Credential, Token])
   ],

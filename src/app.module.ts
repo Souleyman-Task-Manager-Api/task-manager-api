@@ -1,16 +1,22 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TasksModule } from './tasks/tasks.module';
 import { SecurityModule } from './security/security.module';
+import { AppController } from './app.controller';
+import { TaskEntity } from './tasks/entities/task.entity';
+import { Credential, Token } from './security/model/entity';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'task-manager.db',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      entities: [TaskEntity, Credential, Token],
       synchronize: true,
     }),
-    SecurityModule,  // ← Ajoutez cette ligne
+    TasksModule,
+    SecurityModule,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}

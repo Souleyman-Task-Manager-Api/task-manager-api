@@ -39,7 +39,7 @@ export class TasksController {
     return this.tasksService.findByStatus(status);
   }
 
-  @Get('db-info')  // ⚠️ Important : doit être AVANT la route :id !
+  @Get('db-info')
   @ApiOperation({ summary: 'Informations sur la base de données' })
   async getDbInfo() {
     return {

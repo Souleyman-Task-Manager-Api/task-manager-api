@@ -3,11 +3,11 @@ import { JwtService } from '@nestjs/jwt';
 import { from, Observable } from 'rxjs';
 import { NoTokenFoundedException, TokenExpiredException } from '../security.exception';
 import { Reflector } from '@nestjs/core';
-import { IS_PUBLIC_KEY } from '@common/config';
+import { IS_PUBLIC_KEY } from '../../common/config';
 import { isNil } from 'lodash';
 import { SecurityService } from '../service/security.service';
 import { map } from 'rxjs/operators';
-import { Credential } from '../model';
+import { Credential } from '../model/entity';
 
 @Injectable()
 export class JwtGuard implements CanActivate {

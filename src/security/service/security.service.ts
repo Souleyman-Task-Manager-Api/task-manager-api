@@ -22,7 +22,7 @@ export class SecurityService {
   ) {}
 
   async detail(id: string): Promise<Credential> {
-    const result = await this. repository.findOneBy({ credential_id: id });
+    const result = await this.repository.findOneBy({ credential_id: id });
     if (!isNil(result)) {
       return result;
     }
@@ -30,19 +30,19 @@ export class SecurityService {
   }
 
   async signIn(payload: SignInPayload, isAdmin: boolean): Promise<Token | null> {
-    let result = null;
+    let result: Credential | null = null;
     
     if (payload.socialLogin) {
-      if (!isNil(payload.facebookHash) && payload.facebookHash.length > 0) {
-        result = await this. repository.findOneBy({ facebookHash: payload.facebookHash, isAdmin });
-      } else if (!isNil(payload.googleHash) && payload.googleHash.length > 0) {
-        result = await this. repository.findOneBy({ googleHash: payload.googleHash, isAdmin });
+      if (!isNil(payload.facebookHash) && payload.facebookHash && payload.facebookHash.length > 0) {
+        result = await this.repository.findOneBy({ facebookHash: payload.facebookHash, isAdmin });
+      } else if (!isNil(payload.googleHash) && payload.googleHash && payload.googleHash.length > 0) {
+        result = await this.repository.findOneBy({ googleHash: payload.googleHash, isAdmin });
       }
     } else {
       result = await this.repository.findOneBy({ username: payload.username, isAdmin });
     }
     
-    if (!isNil(result) && (payload.socialLogin || await comparePassword(payload.password, result.password))) {
+    if (!isNil(result) && result && (payload.socialLogin || await comparePassword(payload.password, result.password))) {
       return this.tokenService.getTokens(result);
     }
     throw new UserNotFoundException();
@@ -58,7 +58,7 @@ export class SecurityService {
         ? await encryptPassword(payload.password) 
         : '';
       
-      const credential = await this. repository.save(
+      const credential = await this.repository.save(
         Builder<Credential>()
           .username(payload.username)
           .password(encryptedPassword)
@@ -69,6 +69,7 @@ export class SecurityService {
       );
       return this.tokenService.getTokens(credential);
     } catch (e) {
+      console.error('Signup error:', e);
       throw new SignupException();
     }
   }
@@ -81,7 +82,7 @@ export class SecurityService {
     try {
       const detail = await this.detail(id);
       await this.tokenService.deleteFor(detail);
-      await this. repository.remove(detail);
+      await this.repository.remove(detail);
     } catch (e) {
       throw new CredentialDeleteException();
     }

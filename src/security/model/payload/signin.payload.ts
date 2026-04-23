@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsBoolean } from 'class-validator';
 
 export class SignInPayload {
-  @ApiProperty({ example: 'john_doe' })
+  @ApiProperty({ example: 'Youssouf' })
   @IsNotEmpty()
   username: string;
 

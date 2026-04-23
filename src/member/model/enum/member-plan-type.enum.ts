@@ -1,0 +1,4 @@
+export enum MemberPlanType {
+  SUBSCRIPTION = 'SUBSCRIPTION',
+  LIMITED_CARD = 'LIMITED_CARD'
+}

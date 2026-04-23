@@ -5,8 +5,8 @@ import { SecurityController } from './security.controller';
 import { SecurityService } from './service/security.service';
 import { TokenService } from './jwt/token.service';
 import { Credential, Token } from './model/entity';
-import { configManager } from '@common/config/config.manager';
-import { ConfigKey } from '@common/config/enum';
+import { configManager } from '../common/config/config.manager';
+import { ConfigKey } from '../common/config/enum';
 
 @Module({
   imports: [

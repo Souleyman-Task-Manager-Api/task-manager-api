@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsEmail, Length, IsOptional } from 'class-validator';
 
 export class SignupPayload {
-  @ApiProperty({ example: 'john_doe' })
+  @ApiProperty({ example: 'Youssouf' })
   @IsNotEmpty()
   @Length(3, 20)
   username: string;
@@ -12,7 +12,7 @@ export class SignupPayload {
   @Length(6, 50)
   password: string;
 
-  @ApiProperty({ example: 'john@example.com' })
+  @ApiProperty({ example: 'keep.hopealif@gmail.com' })
   @IsEmail()
   @IsNotEmpty()
   mail: string;

@@ -1,0 +1,7 @@
+export enum MemberPlanPaymentType {
+  MENSUAL = 'MENSUAL',
+  TRIMESTRIAL = 'TRIMESTRIAL',
+  SEMESTRIAL = 'SEMESTRIAL',
+  ANNUAL = 'ANNUAL',
+  ONE_TIME = 'ONE_TIME'
+}

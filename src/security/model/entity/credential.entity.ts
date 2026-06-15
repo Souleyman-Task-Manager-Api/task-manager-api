@@ -1,9 +1,9 @@
-import { Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryColumn, BeforeInsert } from 'typeorm';
 import { ulid } from 'ulid';
 
 @Entity()
 export class Credential {
-  @PrimaryColumn('varchar', { length: 26, default: () => `'${ulid()}'` })
+  @PrimaryColumn('varchar', { length: 26 })
   credential_id: string;
 
   @Column({ nullable: false, unique: true })
@@ -32,4 +32,9 @@ export class Credential {
 
   @CreateDateColumn()
   updated: Date;
+
+  @BeforeInsert()
+  generateId() {
+    this.credential_id = ulid();
+  }
 }

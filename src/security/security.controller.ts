@@ -17,16 +17,16 @@ export class SecurityController {
     return this.service.signIn(payload, false);
   }
 
-  @Public()
+  @Public()  // ← AJOUTEZ CETTE LIGNE
   @Post('signup')
   public signUp(@Body() payload: SignupPayload) {
-    return this. service.signup(payload);
+    return this.service.signup(payload);
   }
 
   @Public()
   @Post('refresh')
   public refresh(@Body() payload: RefreshTokenPayload) {
-    return this. service.refresh(payload);
+    return this.service.refresh(payload);
   }
 
   @Get('me')
@@ -36,6 +36,6 @@ export class SecurityController {
 
   @Delete('delete/:id')
   public delete(@Param('id') id: string) {
-    return this. service.delete(id);
+    return this.service.delete(id);
   }
 }

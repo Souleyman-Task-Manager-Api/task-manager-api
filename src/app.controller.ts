@@ -1,28 +1,19 @@
-import { Controller, Get } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { Controller, Get, Post, Body } from '@nestjs/common';
 
-@ApiTags('Accueil')
 @Controller()
 export class AppController {
-  @Get()
-  @ApiOperation({ summary: 'Page d\'accueil de l\'API' })
-  getHome() {
+  
+  @Post('signup-test')
+  async testSignup(@Body() body: any) {
     return {
-      message: 'Bienvenue sur l\'API Task Manager',
-      version: '1.0',
-      endpoints: {
-        tasks: '/tasks',
-        stats: '/tasks/stats',
-        docs: '/api-docs',
-        signin: '/account/signin',
-        signup: '/account/signup'
-      }
+      success: true,
+      message: 'Endpoint fonctionne',
+      received: body
     };
   }
 
-  @Get('hello')
-  @ApiOperation({ summary: 'Message de bienvenue' })
-  getHello() {
-    return { message: 'Hello World! 🚀' };
+  @Get()
+  getHello(): string {
+    return 'Task Manager API is running!';
   }
 }

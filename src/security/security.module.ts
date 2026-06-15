@@ -5,20 +5,15 @@ import { SecurityController } from './security.controller';
 import { SecurityService } from './service/security.service';
 import { TokenService } from './jwt/token.service';
 import { Credential, Token } from './model/entity';
-import { configManager } from '../common/config/config.manager';
-import { ConfigKey } from '../common/config/enum';
+import { JwtGuard } from './guards/jwt.guard';
 
 @Module({
   imports: [
-    JwtModule.register({
-      global: true,
-      secret: configManager.getValue(ConfigKey.JWT_TOKEN_SECRET),
-      signOptions: { expiresIn: configManager.getValue(ConfigKey.JWT_TOKEN_EXPIRE_IN) as any },
-    }),
-    TypeOrmModule.forFeature([Credential, Token])
+    TypeOrmModule.forFeature([Credential, Token]),
+    JwtModule.register({}),
   ],
   controllers: [SecurityController],
-  providers: [SecurityService, TokenService],
-  exports: [SecurityService]
+  providers: [SecurityService, TokenService, JwtGuard],
+  exports: [SecurityService, TokenService, JwtGuard],
 })
 export class SecurityModule {}

@@ -13,13 +13,13 @@ export enum TaskPriority {
 }
 
 export interface Task {
-  id: string;
-  title: string;
-  description: string;
-  status: TaskStatus;
-  priority: TaskPriority;
-  createdAt: Date;
-  updatedAt: Date;
-  dueDate?: Date;
-  tags: string[];
+  id: string; // Identifiant unique
+  title: string; // Titre de la tâche
+  description: string; // Description détaillée
+  status: TaskStatus; // Statut actuel
+  priority: TaskPriority; // Niveau de priorité
+  createdAt: Date; // Date de création
+  updatedAt: Date; // Date de modification
+  dueDate?: Date; // Date d'échéance (optionnelle)
+  tags: string[]; // Tags associés
 }

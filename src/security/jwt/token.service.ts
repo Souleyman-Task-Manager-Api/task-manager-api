@@ -24,24 +24,29 @@ export class TokenService {
       await this.repository.delete({ credential });
       const payload = { sub: credential.credential_id };
       
+      // Valeurs par défaut si les configs n'existent pas
+      const tokenSecret = configManager.getValue(ConfigKey.JWT_TOKEN_SECRET) || 'defaultTokenSecret123456789';
+      const tokenExpire = configManager.getValue(ConfigKey.JWT_TOKEN_EXPIRE_IN) || '1h';
+      const refreshSecret = configManager.getValue(ConfigKey.JWT_REFRESH_TOKEN_SECRET) || 'defaultRefreshSecret123456789';
+      const refreshExpire = configManager.getValue(ConfigKey.JWT_REFRESH_TOKEN_EXPIRE_IN) || '7d';
+      
       const token = await this.jwtService.signAsync(payload, {
-        secret: configManager.getValue(ConfigKey.JWT_TOKEN_SECRET),
-        expiresIn: configManager.getValue(ConfigKey.JWT_TOKEN_EXPIRE_IN) as any
+        secret: tokenSecret,
+        expiresIn: tokenExpire as any
       });
       
       const refreshToken = await this.jwtService.signAsync(payload, {
-        secret: configManager.getValue(ConfigKey.JWT_REFRESH_TOKEN_SECRET),
-        expiresIn: configManager.getValue(ConfigKey.JWT_REFRESH_TOKEN_EXPIRE_IN) as any
+        secret: refreshSecret,
+        expiresIn: refreshExpire as any
       });
       
-      await this.repository.upsert(
-        Builder<Token>()
-          .token(token)
-          .refreshToken(refreshToken)
-          .credential(credential)
-          .build(),
-        ['credential']
-      );
+      const newToken = Builder<Token>()
+        .token(token)
+        .refreshToken(refreshToken)
+        .credential(credential)
+        .build();
+      
+      await this.repository.upsert(newToken, ['credential']);
       
       const savedToken = await this.repository.findOneBy({ token });
       if (!savedToken) {
@@ -49,7 +54,7 @@ export class TokenService {
       }
       return savedToken;
     } catch (e) {
-      this.logger.error(e.message);
+      this.logger.error('Token generation error: ' + e.message);
       throw new TokenGenerationException();
     }
   }
@@ -60,8 +65,9 @@ export class TokenService {
 
   async refresh(payload: RefreshTokenPayload): Promise<Token> {
     try {
+      const refreshSecret = configManager.getValue(ConfigKey.JWT_REFRESH_TOKEN_SECRET) || 'defaultRefreshSecret123456789';
       const { sub: id } = this.jwtService.verify(payload.refresh, {
-        secret: configManager.getValue(ConfigKey.JWT_REFRESH_TOKEN_SECRET)
+        secret: refreshSecret
       });
       const credential = await this.credentialRepository.findOneBy({ credential_id: id });
       if (!credential) {
@@ -69,7 +75,7 @@ export class TokenService {
       }
       return await this.getTokens(credential);
     } catch (e) {
-      this.logger.error(e.message);
+      this.logger.error('Refresh error: ' + e.message);
       throw new TokenExpiredException();
     }
   }

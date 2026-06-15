@@ -4,6 +4,7 @@ import { TasksModule } from './tasks/tasks.module';
 import { SecurityModule } from './security/security.module';
 import { MemberModule } from './member/member.module';
 import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { TaskEntity } from './tasks/entities/task.entity';
 import { Credential, Token } from './security/model/entity';
 import { Member, MemberPlan, MemberSubscription, Address } from './member/model/entity';
@@ -21,5 +22,6 @@ import { Member, MemberPlan, MemberSubscription, Address } from './member/model/
     MemberModule,
   ],
   controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

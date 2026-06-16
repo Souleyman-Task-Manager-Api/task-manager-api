@@ -12,8 +12,12 @@ import { Member, MemberPlan, MemberSubscription, Address } from './member/model/
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'task-manager.db',
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'postgres',
+      password: 'Root', // ← Remplacez par votre vrai mot de passe
+      database: 'task_manager_db',
       entities: [TaskEntity, Credential, Token, Member, MemberPlan, MemberSubscription, Address],
       synchronize: true,
     }),
